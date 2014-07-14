@@ -105,7 +105,7 @@ main = bracket (return ()) (\() -> hFlush stdout >> hFlush stderr) $ \() -> do
   when (null (optInvAcc opts)) (commandLineError "required --investment-account option is missing\n")
   when (null (optInterestAcc opts)) (commandLineError "required --interest-account option is missing\n")
   when (length args > 0) (commandLineError "no command line arguments allowed")
-  jnl' <- readJournalFile Nothing Nothing (optInput opts) >>= either fail return
+  jnl' <- readJournalFile Nothing Nothing True (optInput opts) >>= either fail return
 
   let ts = jtxns $ filterJournalTransactions (Acct (optInvAcc opts)) jnl'
   when (null ts) $ do
