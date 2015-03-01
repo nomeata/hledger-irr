@@ -14,6 +14,7 @@ import Text.Printf
 import Data.List
 import Data.Ord
 import Statistics.Math.RootFinding
+import Data.Decimal
 
 
 import Paths_hledger_irr ( version )
@@ -148,7 +149,7 @@ main = bracket (return ()) (\() -> hFlush stdout >> hFlush stderr) $ \() -> do
 
       -- 0% is always a solution, so require at least something here
       putStr $ printf "%s - %s: " (showDate ibegin) (showDate iend)
-      case ridders 0.00001 (0.000001,1000) (aquantity . interestSum iend totalCF) of
+      case ridders 0.00001 (0.000001,1000) (realToFrac . aquantity . interestSum iend totalCF) of
         Root rate -> putStrLn (printf "%0.2f%%" ((rate-1)*100))
         _ -> putStrLn "Error: Failed to find solution."
 
@@ -169,7 +170,7 @@ type CashFlow = [(Day, Amount)]
 
 -- | Divide an amount's quantity by a constant.
 multiplyAmount :: Amount -> Double -> Amount
-multiplyAmount a@Amount{aquantity=q} d = a{aquantity=q*d}
+multiplyAmount a@Amount{aquantity=q} d = a{aquantity=q *. d}
 
 
 interestSum :: Day -> CashFlow -> Double -> Amount
