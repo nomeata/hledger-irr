@@ -29,7 +29,7 @@ Cabal-version:          >= 1.8
 Tested-with:            GHC >= 7.4.1 && <= 7.4.1
 Description:
  hledger-irr is a small command-line utility based on Simon
- Michael's hleder library. Its purpose is to compute the internal rate of
+ Michael's hledger library. Its purpose is to compute the internal rate of
  return, also known as the effective interest rate, of a given investment.
  After specifying what account holds the investment, and what account stores
  the gains (or losses, or fees, or cost), it calculates the hypothetical
@@ -74,7 +74,14 @@ cat <<__END__
 
 Executable hledger-irr
   Main-is:              Main.hs
-  Build-depends:        base >= 3 && < 5, hledger-lib >= 0.23.98 && < 0.28, Decimal, time, Cabal, statistics >= 0.10
+  Build-depends:
+    base >= 3 && < 5,
+    hledger-lib >= 1 && < 1.1,
+    Decimal,
+    time,
+    Cabal,
+    statistics >= 0.10,
+    text
   Ghc-Options:          -Wall
 
 source-repository head

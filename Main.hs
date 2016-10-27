@@ -15,6 +15,7 @@ import Data.List
 import Data.Ord
 import Statistics.Math.RootFinding
 import Data.Decimal
+import qualified Data.Text as T
 
 
 import Paths_hledger_irr ( version )
@@ -26,8 +27,8 @@ data Options = Options
   , optInput        :: FilePath
   , optInvAcc       :: String
   , optInterestAcc  :: String
-  , optBegin        :: Maybe String
-  , optEnd          :: Maybe String
+  , optBegin        :: Maybe T.Text
+  , optEnd          :: Maybe T.Text
   , optInterval     :: Maybe Interval
   }
 
@@ -65,10 +66,10 @@ options =
               (ReqArg (\a o -> o { optInterestAcc = a }) "ACCOUNT")
               "interest/gain/fees/losses account"
  , Option "b" ["begin"]
-              (ReqArg (\d o -> o { optBegin = Just d }) "DATE")
+              (ReqArg (\d o -> o { optBegin = Just (T.pack d) }) "DATE")
               "calculate interest from this date"
  , Option "e" ["end"]
-              (ReqArg (\d o -> o { optEnd = Just d }) "DATE")
+              (ReqArg (\d o -> o { optEnd = Just (T.pack d) }) "DATE")
               "calculate interest until this date"
  , Option "D" ["daily"]
               (NoArg (\o -> o { optInterval = Just (Days 1) }))
@@ -192,7 +193,7 @@ accountAmount query = sumPostings . filter (matchesPosting query) . concatMap re
 
 -- | Convert a smart date string to a day using
 -- the provided reference date, or raise an error.
-fixSmartDateStr' :: Day -> String -> Day
+fixSmartDateStr' :: Day -> T.Text -> Day
 fixSmartDateStr' d s = either
                        (\e->error' $ printf "could not parse date %s %s" (show s) (show e))
                        id
