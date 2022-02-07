@@ -1,19 +1,14 @@
 #!/bin/bash
 
 function cmd {
-    if [ -x dist/build/hledger-irr/hledger-irr ]
-    then
-        echo ' > $ hledger-irr' $1
-        eval dist/build/hledger-irr/hledger-irr $1 | sed -e 's/^/ > /'
-    else
-        echo "dist/build/hledger-irr/hledger-irr missing, rerun $0 to update description" >&2
-    fi
+    echo ' > $ hledger-irr' $1
+    eval cabal new-run -v0 hledger-irr -- $1 | sed -e 's/^/ > /'
 }
 
 VERSION="$(darcs show tag | head -n 1)"
 
-rm -f hledger-irr.cabal
-exec >hledger-irr.cabal
+rm -f hledger-irr.cabal.tmp
+exec >hledger-irr.cabal.tmp
 
 cat <<__END__
 Name:                   hledger-irr
@@ -76,11 +71,12 @@ Executable hledger-irr
   Main-is:              Main.hs
   Build-depends:
     base >= 3 && < 5,
-    hledger-lib >= 1 && < 1.1,
+    hledger-lib >= 1.10,
     Decimal,
     time,
     Cabal,
-    statistics >= 0.10,
+    data-default-class,
+    math-functions == 0.3.*,
     text
   Ghc-Options:          -Wall
 
@@ -90,4 +86,5 @@ source-repository head
 
 __END__
 
+mv -f hledger-irr.cabal.tmp hledger-irr.cabal
 chmod -w hledger-irr.cabal

@@ -1,6 +1,6 @@
 module Main ( main ) where
 
-import Hledger
+import Hledger hiding (multiplyAmount)
 
 import Control.Exception ( bracket )
 import Control.Monad
@@ -13,9 +13,10 @@ import Data.Time.Calendar
 import Text.Printf
 import Data.List
 import Data.Ord
-import Statistics.Math.RootFinding
+import Numeric.RootFinding
 import Data.Decimal
 import qualified Data.Text as T
+import Data.Default.Class
 
 
 import Paths_hledger_irr ( version )
@@ -107,7 +108,7 @@ main = bracket (return ()) (\() -> hFlush stdout >> hFlush stderr) $ \() -> do
   when (null (optInvAcc opts)) (commandLineError "required --investment-account option is missing\n")
   when (null (optInterestAcc opts)) (commandLineError "required --interest-account option is missing\n")
   when (length args > 0) (commandLineError "no command line arguments allowed")
-  jnl' <- readJournalFile Nothing Nothing True (optInput opts) >>= either fail return
+  jnl' <- readJournalFile definputopts (optInput opts) >>= either fail return
 
   let ts = jtxns $ filterJournalTransactions (Acct (optInvAcc opts)) jnl'
   when (null ts) $ do
@@ -150,7 +151,7 @@ main = bracket (return ()) (\() -> hFlush stdout >> hFlush stderr) $ \() -> do
 
       -- 0% is always a solution, so require at least something here
       putStr $ printf "%s - %s: " (showDate ibegin) (showDate iend)
-      case ridders 0.00001 (0.000001,1000) (realToFrac . aquantity . interestSum iend totalCF) of
+      case ridders def (0.000001,1000) (realToFrac . aquantity . interestSum iend totalCF) of
         Root rate -> putStrLn (printf "%0.2f%%" ((rate-1)*100))
         _ -> putStrLn "Error: Failed to find solution."
 
